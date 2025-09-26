@@ -3,6 +3,8 @@ import { initializeApp } from 'firebase/app';
 import { getAuth, signInAnonymously } from 'firebase/auth';
 import { getFirestore, collection, addDoc, onSnapshot, query, doc, updateDoc, deleteDoc, where } from 'firebase/firestore';
 import { firebaseConfig, geminiApiKey, appId } from './config';
+import AdminAuth from './AdminAuth';
+import AdminDashboard from './AdminDashboard';
 
 // Gemini API configuration
 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${geminiApiKey}`;
@@ -635,7 +637,7 @@ const PasswordModal = ({ isVisible, onClose, onVerify }) => {
   );
 };
 
-const HomePage = ({ setCurrentPage, projects, setEditingProject, setSelectedProject, setPasswordModalVisible }) => {
+const HomePage = ({ setCurrentPage, projects, setEditingProject, setSelectedProject, setPasswordModalVisible, setShowAdminAuth }) => {
   const handleEditProject = (project) => {
     setEditingProject(project);
     setCurrentPage('createProject');
@@ -649,7 +651,17 @@ const HomePage = ({ setCurrentPage, projects, setEditingProject, setSelectedProj
   return (
     <div className="flex flex-col items-center h-full bg-gray-100 font-sans p-4">
       <header className="bg-white p-4 shadow-md rounded-b-lg w-full fixed top-0 z-10">
-        <h1 className="text-xl font-bold text-center">JTS Project Manager</h1>
+        <div className="flex justify-between items-center">
+          <div className="w-20"></div>
+          <h1 className="text-xl font-bold text-center">JTS Project Manager</h1>
+          <button
+            onClick={() => setShowAdminAuth(true)}
+            className="px-3 py-1 bg-gray-600 text-white text-xs rounded-full hover:bg-gray-700 transition-colors"
+            title="Admin Access"
+          >
+            Admin
+          </button>
+        </div>
       </header>
       <main className="flex-1 overflow-y-auto p-4 pt-20 w-full">
         <div className="bg-white p-4 rounded-lg shadow-md">
@@ -807,6 +819,8 @@ const App = () => {
   const [user, setUser] = useState(null); // eslint-disable-line no-unused-vars
   const [db, setDb] = useState(null);
   const [userId, setUserId] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [showAdminAuth, setShowAdminAuth] = useState(false);
 
   useEffect(() => {
     try {
@@ -1073,6 +1087,15 @@ const App = () => {
     return false;
   };
 
+  // Admin routing
+  if (showAdminAuth) {
+    return <AdminAuth onAuthenticated={setIsAdmin} />;
+  }
+
+  if (isAdmin) {
+    return <AdminDashboard onLogout={() => setIsAdmin(false)} />;
+  }
+
   return (
     <div className="h-screen w-full flex items-center justify-center bg-gray-200 p-4">
       <div className="w-full max-w-md h-full bg-white rounded-xl shadow-lg overflow-hidden">
@@ -1083,6 +1106,7 @@ const App = () => {
             setEditingProject={setEditingProject}
             setSelectedProject={setSelectedProject}
             setPasswordModalVisible={setPasswordModalVisible}
+            setShowAdminAuth={setShowAdminAuth}
           />
         ) : currentPage === 'createProject' ? (
           <CreateProjectPage
