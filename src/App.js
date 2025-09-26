@@ -1088,12 +1088,18 @@ const App = () => {
   };
 
   // Admin routing
-  if (showAdminAuth) {
-    return <AdminAuth onAuthenticated={setIsAdmin} />;
+  if (showAdminAuth && !isAdmin) {
+    return <AdminAuth onAuthenticated={(auth) => {
+      setIsAdmin(auth);
+      setShowAdminAuth(false);
+    }} />;
   }
 
   if (isAdmin) {
-    return <AdminDashboard onLogout={() => setIsAdmin(false)} />;
+    return <AdminDashboard onLogout={() => {
+      setIsAdmin(false);
+      setShowAdminAuth(false);
+    }} />;
   }
 
   return (
