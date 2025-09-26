@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { initializeApp } from 'firebase/app';
-import { getAuth, signInWithCustomToken, signInAnonymously } from 'firebase/auth';
+import { getAuth, signInAnonymously } from 'firebase/auth';
 import { getFirestore, collection, addDoc, onSnapshot, query, doc, updateDoc, deleteDoc, where } from 'firebase/firestore';
 import { firebaseConfig, geminiApiKey, appId } from './config';
 
@@ -818,11 +818,7 @@ const App = () => {
 
         const setupAuth = async () => {
           try {
-            if (initialAuthToken) {
-              await signInWithCustomToken(auth, initialAuthToken);
-            } else {
-              await signInAnonymously(auth);
-            }
+            await signInAnonymously(auth);
             const currentUser = auth.currentUser;
             setUser(currentUser);
             setUserId(currentUser.uid);
