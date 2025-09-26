@@ -22,27 +22,43 @@ const AdminDashboard = ({ onLogout }) => {
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
       
+      console.log('Fetching admin data...');
+      console.log('App ID:', appId);
+      console.log('Firebase config:', firebaseConfig);
+      
       // Fetch all projects from all users
-      const projectsSnapshot = await getDocs(collection(db, `artifacts/${appId}/users`));
+      const usersCollectionPath = `artifacts/${appId}/users`;
+      console.log('Users collection path:', usersCollectionPath);
+      
+      const projectsSnapshot = await getDocs(collection(db, usersCollectionPath));
+      console.log('Users found:', projectsSnapshot.docs.length);
+      
       const projectsData = [];
       const transactionsData = [];
       const reportsData = [];
 
       for (const userDoc of projectsSnapshot.docs) {
         const userId = userDoc.id;
+        console.log('Processing user:', userId);
         
         // Get user's projects
         const userProjectsSnapshot = await getDocs(collection(db, `artifacts/${appId}/users/${userId}/projects`));
+        console.log(`Projects for user ${userId}:`, userProjectsSnapshot.docs.length);
+        
         userProjectsSnapshot.forEach(projectDoc => {
-          projectsData.push({
+          const projectData = {
             id: projectDoc.id,
             userId,
             ...projectDoc.data()
-          });
+          };
+          console.log('Project data:', projectData);
+          projectsData.push(projectData);
         });
 
         // Get user's transactions
         const userTransactionsSnapshot = await getDocs(collection(db, `artifacts/${appId}/users/${userId}/transactions`));
+        console.log(`Transactions for user ${userId}:`, userTransactionsSnapshot.docs.length);
+        
         userTransactionsSnapshot.forEach(transactionDoc => {
           transactionsData.push({
             id: transactionDoc.id,
@@ -53,6 +69,8 @@ const AdminDashboard = ({ onLogout }) => {
 
         // Get user's reports
         const userReportsSnapshot = await getDocs(collection(db, `artifacts/${appId}/users/${userId}/daily_reports`));
+        console.log(`Reports for user ${userId}:`, userReportsSnapshot.docs.length);
+        
         userReportsSnapshot.forEach(reportDoc => {
           reportsData.push({
             id: reportDoc.id,
@@ -61,6 +79,12 @@ const AdminDashboard = ({ onLogout }) => {
           });
         });
       }
+
+      console.log('Final data counts:', {
+        projects: projectsData.length,
+        transactions: transactionsData.length,
+        reports: reportsData.length
+      });
 
       setAllProjects(projectsData);
       setAllTransactions(transactionsData);
@@ -153,6 +177,7 @@ const AdminDashboard = ({ onLogout }) => {
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading admin data...</p>
+          <p className="mt-2 text-sm text-gray-500">Check browser console for debugging info</p>
         </div>
       </div>
     );
@@ -261,7 +286,18 @@ const ProjectsTab = ({ projects, onEdit, onDelete }) => (
       <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
         All Projects ({projects.length})
       </h3>
-      <div className="overflow-x-auto">
+      {projects.length === 0 ? (
+        <div className="text-center py-8">
+          <p className="text-gray-500 mb-4">No projects found in the database.</p>
+          <p className="text-sm text-gray-400">
+            This could mean:
+            <br />• No users have created projects yet
+            <br />• There's a connection issue with Firebase
+            <br />• Check the browser console for error messages
+          </p>
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
@@ -315,7 +351,8 @@ const ProjectsTab = ({ projects, onEdit, onDelete }) => (
             ))}
           </tbody>
         </table>
-      </div>
+        </div>
+      )}
     </div>
   </div>
 );
