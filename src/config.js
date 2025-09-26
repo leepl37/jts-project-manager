@@ -11,4 +11,4 @@ export const firebaseConfig = {
 };
 
 export const geminiApiKey = process.env.REACT_APP_GEMINI_API_KEY || "your_gemini_api_key_here";
-export const appId = process.env.REACT_APP_APP_ID || "default-app-id";
+export const appId = process.env.REACT_APP_APP_ID || firebaseConfig.projectId;
