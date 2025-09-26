@@ -369,7 +369,7 @@ const AddDailyReportPage = ({ editingReport, setCurrentPage, addDailyReport, upd
           {photos.length > 0 && (
             <div className="grid grid-cols-3 gap-2 mt-2">
               {photos.map((photo, index) => (
-                <img key={index} src={photo} alt={`Report Photo ${index + 1}`} className="w-full h-20 object-cover rounded-md shadow" />
+                <img key={index} src={photo} alt={`Report ${index + 1}`} className="w-full h-20 object-cover rounded-md shadow" />
               ))}
             </div>
           )}
@@ -431,7 +431,7 @@ const DailyReportPage = ({ setCurrentPage, dailyReports, deleteDailyReport, setE
                   {report.photos.length > 0 && (
                     <div className="grid grid-cols-3 gap-2 mt-4">
                       {report.photos.map((photo, index) => (
-                        <img key={index} src={photo} alt={`Report Photo ${index + 1}`} className="w-full h-20 object-cover rounded-md shadow" />
+                        <img key={index} src={photo} alt={`Report ${index + 1}`} className="w-full h-20 object-cover rounded-md shadow" />
                       ))}
                     </div>
                   )}
@@ -804,7 +804,7 @@ const App = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [passwordModalVisible, setPasswordModalVisible] = useState(false);
   const [transactionToDelete, setTransactionToDelete] = useState(null);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null); // eslint-disable-line no-unused-vars
   const [db, setDb] = useState(null);
   const [userId, setUserId] = useState(null);
 
